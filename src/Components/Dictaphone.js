@@ -38,11 +38,6 @@ const Dictaphone = ({ input, setinput, language,setLanguage }) => {
 
   return (
     <div>
-      <select value={selectedLanguage} onChange={handleLanguageChange} style={{ backgroundColor: '#222222', color: '#fff' }}>
-        <option value="en">English</option>
-        <option value="ta-IN">Tamil</option>
-        <option value="hi-IN">Hindi</option>
-      </select>
       <img
         src={listening ? OnMic : Mic}
         alt="Mic"

@@ -1,53 +1,104 @@
 import React, { useState } from "react";
-import Switch from "react-switch";
 import Threads from "./Threads";
-import darkmode from "../Assets/darkmode.svg";
-const Home = () => {
-  const [checked, setchecked] = useState(false);
-  const [threads, setthreads] = useState(false);
+import Sidebar from "./Sidebar";
+import { signUp, login } from "./authService"; // Import the authentication service
 
-  const handleClick = () => {
-    if (checked) {
-      setchecked(false);
+const Home = () => {
+  const [threads, setThreads] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(true); // Toggle between sign-up and login
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [message, setMessage] = useState("");
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isSignUp) {
+      const { success, message } = signUp(form.email, form.password);
+      setMessage(message);
+      if (success) {
+        setIsSignUp(false); // Switch to login form after successful sign-up
+      }
     } else {
-      setchecked(true);
+      const { success, message } = await login(form.email, form.password); // Use await to handle the asynchronous login function
+      console.log("In home ", success, message);
+      setMessage(message);
+      if (success) {
+        console.log("Logged In ");
+        setThreads(true); // Navigate to Threads component on successful login
+        setLoggedIn(true); // Set loggedIn to true
+      }
     }
+  };
+  
+
+  const toggleForm = () => {
+    setIsSignUp(!isSignUp);
+    setMessage(""); // Clear any previous messages
   };
 
   return (
-    <div className="bg-[#A9BA9D] w-[100vw] h-[100vh]">
+    <div className="bg-[#A9BA9D] w-[100vw] h-[100vh] flex items-center justify-center">
+      {loggedIn && <Sidebar />} {/* Render Sidebar if loggedIn */}
       {threads ? (
         <Threads />
       ) : (
-        <div>
-          {/* <div className="flex justify-end p-4">
-            <img src={darkmode} className="px-4" />
-            <Switch
-              onChange={handleClick}
-              checked={checked}
-              onColor={"#FFE600"}
-              handleDiameter={30}
-              uncheckedIcon={false}
-              checkedIcon={false}
-              boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-              activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-              height={20}
-              width={48}
-              className="react-switch"
-              id="material-switch"
-            />
-          </div> */}
-          <div className="mt-[22vh] flex flex-col mx-10 items-center justify-center">
-            <button
-              className="bg-[#808080]  rounded-2xl p-2 w-80 m-3 text-lg text-white font-serif"
-              onClick={() => setthreads(true)}
-            >
-              Seek legal clarity? Chat with me
-            </button>
-            {/* <img src={Logo} alt="Logo" className="w-[14vw] py-6  mx-auto" /> */}
-            {/* <img src="C:/Users/hp/OneDrive/Pictures/Screenshots/Logo.png" alt="Logo" width="100" height="100" style={{ backgroundColor: "transparent" }} /> */}
-
-          </div>
+        <div className="bg-[#BDD1BD] p-8 rounded shadow-md w-96">
+          <h2 className="text-2xl font-bold mb-6 text-center">
+            {isSignUp ? "Sign Up" : "Login"}
+          </h2>
+          {message && (
+            <p className={`mb-4 ${message.includes("success") ? "text-green-500" : "text-red-500"}`}>
+              {message}
+            </p>
+          )}
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Username
+              </label>
+              <input
+                type="string"
+                name="email"
+                value={form.email}
+                onChange={handleInputChange}
+                required
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              />
+            </div>
+            <div className="mb-6">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleInputChange}
+                required
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-10 rounded focus:outline-none focus:shadow-outline"
+              >
+                {isSignUp ? "Sign Up" : "Login"}
+              </button>
+              <button
+                type="button"
+                onClick={toggleForm}
+                className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 ml-2"
+              >
+                {isSignUp ? "Already have an account? Login" : "Need an account? Sign Up"}
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>

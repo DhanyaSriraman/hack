@@ -75,8 +75,17 @@ function Threads() {
   };
 
   const handleSubmit = async (e) => {
+    const parsedId = parseInt(id);
     e.preventDefault();
     console.log(input+" heyyyy input")
+    const msg = {
+      conv_id: parsedId,
+      user_msg: input
+  };
+  const msgString = JSON.stringify(msg);
+  console.log(msgString);
+    // const response1 = await axios.post("https://p9v82c8s-8000.inc1.devtunnels.ms/v1/conv/chat", msg);
+    // console.log(response1)
     const response = await axios.post("http://127.0.0.1:5000/api", { msg: input ,language: language});
     setMessages([...messages, { input: input, res: response.data }]);
     setinput("");
