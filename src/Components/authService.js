@@ -25,12 +25,13 @@ const users = [
       console.log(response.status)
       if (response.status === 200) {
         console.log("Hey")
-        return { success: true, message: "Login successful" };
+        console.log(response.data.user_id)
+        return { user_id : response.data.user_id,success: true, message: "Login successful" };
       } else {
-        return { success: false, message: "Invalid email or password" };
+        return { user_id :0,success: false, message: "Invalid email or password" };
       }
     } catch (error) {
-      return { success: false, message: "Invalid email or password" };
+      return { user_id:0,success: false, message: "Invalid email or password" };
     }
   };
   // export const login = (email, password) => {

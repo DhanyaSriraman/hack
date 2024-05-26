@@ -8,33 +8,22 @@ import Switch from "react-switch";
 import Dictaphone from "./Dictaphone";
 import Send from "../Assets/send.svg";
 import { useParams } from 'react-router-dom';
-const conversations ={
-  "conversation": [
-      {
-          "chat_id": 1,
-          "user_msg": "What is wikipedia",
-          "ai_msg": "Wikipedia is an online encyclopedia that is maintained by volunteers and dedicated to providing free, up-to-date information on various subjects. It contains articles on various topics from around the world, as well as photographs, maps, and other multimedia resources. Wikipedia aims to provide a wide range of knowledge on various subjects in order to help people learn and understand complex ideas. It is one of the most popular and widely used encyclopedias in the world today."
-      },
-      {
-          "chat_id": 2,
-          "user_msg": "tell me about Google-search",
-          "ai_msg": "Google Search is an online search engine that allows users to search for information, images, and videos from the internet using keywords in their queries. The search engine works by processing user input, comparing it to the available results on the web, and returning relevant results to the user.\nTo use Google Search, you can simply type your query into the search box or click on the \"Search\" button in the toolbar above your screen. The search engine will then display a list of websites related to your query,"
-      },
-      {
-          "chat_id": 3,
-          "user_msg": "tell me about Java",
-          "ai_msg": "Java is an open-source programming language developed by Sun Microsystems in 1995. It was designed to be platform-independent and can run on any operating system, including Windows, Linux, macOS, and Android.\nJava is widely used for building web applications, enterprise software, mobile apps, and other types of software that require a large amount of processing power. It has gained popularity due to its simplicity, flexibility, and wide range of libraries and frameworks available for developing desktop and web applications.\nOne of"
-      },
-      {
-          "chat_id": 4,
-          "user_msg": "tell me about python",
-          "ai_msg": "Python is a high-level, interpreted programming language that was designed to be easy for beginners and experienced programmers alike. It was created by Guido van Rossum in 1991 and has since become one of the most widely used languages in the world.\nPython has a wide range of applications, including web development, data analysis, artificial intelligence, game development, and more. It supports multiple programming paradigms, such as procedural, object-oriented, and functional programming, which allows developers to write"
-      }
-  ]
-}
+let user_id_final=0
+
 function Threads() {
   console.log("In threads")
   const { id } = useParams();
+  const{ user_id }= useParams();
+  // const[user_id1,setUserId]=useState(0)
+  console.log(user_id)
+  if(user_id!==undefined){
+    user_id_final=user_id
+  }
+  // if(user_id!==undefined){
+  //   console.log("Not null user id")
+  //   setUserId(user_id1)
+  // }
+  // console.log(user_id,"User Id")
   console.log("Conversation ID:", id);
   const [checked, setchecked] = useState(false);
   const [input, setinput] = useState("");
@@ -42,6 +31,12 @@ function Threads() {
   const [typing, settyping] = useState(false);
   const [messages, setMessages] = useState([]);
   const [language, setLanguage] = useState(""); 
+  const newChat = {
+    user_id: user_id_final,
+    created_at : Math.floor(Date.now() / 1000)
+  }
+  const newChatString= JSON.stringify(newChat);
+  console.log(newChatString)
   useEffect(() => {
     if (id !== undefined) {
       console.log("Hey in threads fetch")
@@ -67,6 +62,15 @@ function Threads() {
       // }
     }else {
       setMessages([]);
+      const getConvId = async () => {
+        try{
+          const idRes = await axios.post("https://p9v82c8s-8000.inc1.devtunnels.ms/v1/conv", newChat);
+          console.log(idRes)
+        }catch(error){
+          console.error('Error fetching conversation:', error);
+        }
+      };
+      getConvId();
     }
   }, [id]);
 
@@ -80,14 +84,15 @@ function Threads() {
     console.log(input+" heyyyy input")
     const msg = {
       conv_id: parsedId,
-      user_msg: input
+      user_msg: input,
+      doc_name : "java"
   };
   const msgString = JSON.stringify(msg);
   console.log(msgString);
-    // const response1 = await axios.post("https://p9v82c8s-8000.inc1.devtunnels.ms/v1/conv/chat", msg);
-    // console.log(response1)
+    const response1 = await axios.post("https://p9v82c8s-8000.inc1.devtunnels.ms/v1/conv/chat", msg);
+    console.log(response1)
     const response = await axios.post("http://127.0.0.1:5000/api", { msg: input ,language: language});
-    setMessages([...messages, { input: input, res: response.data }]);
+    setMessages([...messages, { input: input, res: response1.data.response }]);
     setinput("");
   };
 

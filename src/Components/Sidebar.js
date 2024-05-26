@@ -33,6 +33,7 @@ function Sidebar() {
   const fetchConversation = async () => {
     try {
       console.log("In fetch prompts")
+      const newTimestamp = new Date().toISOString();
       const response = await axios.get('https://p9v82c8s-8000.inc1.devtunnels.ms/v1/conv/2/history');
       setConversation(response.data.conversations);
       console.log(conversation)
@@ -60,7 +61,7 @@ return (
     <div className="flex flex-col justify-between h-[80vh]">
       <img src={Logo4} alt="Logo" className="w-[17vw] h-[30vh] py-3 mx-auto" />
       <div className="flex flex-col justify-center items-center">
-        <Link to={`/threads`}
+        <Link to={`/app/threads`}
           className="bg-[#333333] p-1.5 rounded-2xl w-60 my-2 text-base text-center relative"
           style={{ color: '#72A0C1' }} onClick={() => fetchConversation()}
         >
@@ -70,7 +71,7 @@ return (
           </div>
         </Link>
         {conversation.map((conv) => (
-          <Link key={conv.conversation_id} to={`/threads/${conv.conversation_id}`} className="bg-[#333333] p-1.5 rounded-2xl w-60 my-2 text-base text-center" onClick={() => fetchConversation()}>
+          <Link key={conv.conversation_id} to={`/app/threads/${conv.conversation_id}`} className="bg-[#333333] p-1.5 rounded-2xl w-60 my-2 text-base text-center" onClick={() => fetchConversation()}>
             <div>{conv.conversation_tag}</div>
             <div style={{ color: '#CCCCCC', fontSize: '12px' }}>{format(new Date(conv.created_at), 'dd/MM/yyyy hh:mm a')}</div>
           </Link>
