@@ -1,87 +1,72 @@
-import React, { useState, useEffect } from 'react';
-import Logo from "../Assets/Logo.png";
-import Logo4 from "../Assets/Logo12.png";
-import Declaration from "../Assets/Declaration.png";
-import { Route, Link } from "react-router-dom";
-import axios from 'axios';
-import { format } from 'date-fns';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useEffect } from "react";
+import cx from "classnames";
+import MatsyaLogo from "../Assets/Logo12.png";
+import { Link, useParams } from "react-router-dom";
+import axios from "axios";
+import { formatUnixTimestamp } from "./utils";
 
-
-const conversationsData = {
-  "conversations": [
-    {
-      "conversation_id": 1,
-      "conversation_tag": "Fetch conversation History",
-      "created_at": 100340243
-    },
-    {
-      "conversation_id": 2,
-      "conversation_tag": "second",
-      "created_at": 100340245
-    },
-    {
-      "conversation_id": 3,
-      "conversation_tag": "third",
-      "created_at": 100340289
-    }
-  ]
-};
-function Sidebar() {
+function Sidebar({ setIsConvoStarted }) {
   const [conversation, setConversation] = useState([]);
+  const { user_id } = useParams();
+  const { id } = useParams();
   const fetchConversation = async () => {
     try {
-      console.log("In fetch prompts")
-      const newTimestamp = new Date().toISOString();
-      const response = await axios.get('https://p9v82c8s-8000.inc1.devtunnels.ms/v1/conv/2/history');
+      const response = await axios.get(
+        `http://127.0.0.1:8000/v1/conv/${user_id}/history`
+      );
       setConversation(response.data.conversations);
-      console.log(conversation)
     } catch (error) {
-      console.error('Error fetching conversation:', error);
+      console.error("Error fetching conversation:", error);
+    } finally {
+      setIsConvoStarted(true);
     }
   };
-//   let options = {"Access-Control-Allow-Origin": "*",'Accept':'*/*', "Access-Control-Allow-Methods": "GET,POST,OPTIONS,DELETE,PUT","Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token",'Access-Control-Allow-Credentials':true
-// ,crossorigin:true}
+
   useEffect(() => {
     fetchConversation();
   }, []);
-  console.log(conversation)
-  
-  // const handleConversationClick = async (conversationId) => {
-  //   // Fetch new data when a conversation is clicked
-  //   await fetchConversation();
-  //   // Implement logic for handling conversation click
-  //   console.log('Conversation clicked:', conversationId);
-  // };
-// 127.0.0.1:8000/v1/conv/4/chat/history
 
-return (
-  <div className="bg-[#494949] w-[23vw] h-[100vh] text-white ">
-    <div className="flex flex-col justify-between h-[80vh]">
-      <img src={Logo4} alt="Logo" className="w-[17vw] h-[30vh] py-3 mx-auto" />
-      <div className="flex flex-col justify-center items-center">
-        <Link to={`/app/threads`}
-          className="bg-[#333333] p-1.5 rounded-2xl w-60 my-2 text-base text-center relative"
-          style={{ color: '#72A0C1' }} onClick={() => fetchConversation()}
-        >
-          New Chat
-          <div className="absolute right-5 top-1/2 transform -translate-y-1/2">
-            <FontAwesomeIcon icon={faPlus} />
-          </div>
-        </Link>
-        {conversation.map((conv) => (
-          <Link key={conv.conversation_id} to={`/app/threads/${conv.conversation_id}`} className="bg-[#333333] p-1.5 rounded-2xl w-60 my-2 text-base text-center" onClick={() => fetchConversation()}>
-            <div>{conv.conversation_tag}</div>
-            <div style={{ color: '#CCCCCC', fontSize: '12px' }}>{format(new Date(conv.created_at), 'dd/MM/yyyy hh:mm a')}</div>
+  return (
+    <div className="bg-[#494949] w-[23vw] h-[100vh] text-white ">
+      <div className="flex flex-col justify-between h-[80vh]">
+        <img
+          src={MatsyaLogo}
+          alt="Logo"
+          className="w-[17vw] h-[30vh] py-3 mx-auto"
+        />
+        <div className="flex flex-col justify-center items-center">
+          <Link
+            to={`/app/user/${user_id}/threads`}
+            className="bg-[#333333] p-1.5 rounded-2xl w-60 my-2 text-base text-center relative"
+            style={{ color: "#72A0C1" }}
+            onClick={() => fetchConversation()}
+          >
+            New Chat
+            <div className="absolute right-5 top-1/2 transform -translate-y-1/2"></div>
           </Link>
-        ))}
+          {conversation.map((conv) => {
+              const currentConvStyle =
+                conv.conversation_id == id
+                  ? "bg-[#215A63] p-1.5 rounded-2xl w-60 my-2 text-base text-center"
+                  : "bg-[#333333] p-1.5 rounded-2xl w-60 my-2 text-base text-center";
+              return (
+                <Link
+                  key={conv.conversation_id}
+                  to={`/app/user/${user_id}/threads/${conv.conversation_id}`}
+                  className={cx(currentConvStyle)}
+                  onClick={() => fetchConversation()}
+                >
+                  <div>{conv.conversation_tag}</div>
+                  <div style={{ color: "#CCCCCC", fontSize: "12px" }}>
+                    {formatUnixTimestamp(conv.created_at)}
+                  </div>
+                </Link>
+              );
+            })}
+        </div>
       </div>
     </div>
-  </div>
-);
-
+  );
 }
-
 
 export default Sidebar;

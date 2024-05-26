@@ -2,12 +2,12 @@ import React from "react";
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
 
-const MainLayout = () => {
+const MainLayout = ({ setIsConvoStarted }) => {
   return (
     <div className="flex">
-      <Sidebar />
+      <Sidebar setIsConvoStarted={setIsConvoStarted} />
       <div className="flex-1">
-        <Outlet /> {/* This will render the nested route's component */}
+        <Outlet />
       </div>
     </div>
   );

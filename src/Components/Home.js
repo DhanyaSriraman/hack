@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate hook
-import { signUp, login } from "./authService"; // Import the authentication service
-import Sidebar from "./Sidebar";
+import { login } from "./authService"; // Import the authentication service
 
 const Home = () => {
   const [isSignUp, setIsSignUp] = useState(true); // Toggle between sign-up and login
   const [form, setForm] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
-  const [loggedIn, setLoggedIn] = useState(false);
 
   const navigate = useNavigate(); // Initialize navigate function
 
@@ -18,20 +16,14 @@ const Home = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isSignUp) {
-      const { success, message } = signUp(form.email, form.password);
-      setMessage(message);
-      if (success) {
-        setIsSignUp(false); // Switch to login form after successful sign-up
-      }
-    } else {
-      const { user_id,success, message } = await login(form.email, form.password); // Use await to handle the asynchronous login function
-      setMessage(message);
-      if (success) {
-        setLoggedIn(true); // Set loggedIn to true
-        console.log(user_id,"Printing user id in Home")
-        navigate(`/app/threads/user/${user_id}`); // Navigate to /app/threads route on successful login
-      }
+    const { user_id, success, message } = await login(
+      form.email,
+      form.password
+    ); // Use await to handle the asynchronous login function
+    setMessage(message);
+    if (success) {
+      setIsSignUp(false);
+      navigate(`/app/user/${user_id}/threads`); // Navigate to /app/threads route on successful login
     }
   };
 
@@ -42,13 +34,16 @@ const Home = () => {
 
   return (
     <div className="bg-[#A9BA9D] w-[100vw] h-[100vh] flex items-center justify-center">
-      {/* {loggedIn && <Sidebar />}  */}
       <div className="bg-[#BDD1BD] p-8 rounded shadow-md w-96">
         <h2 className="text-2xl font-bold mb-6 text-center">
           {isSignUp ? "Sign Up" : "Login"}
         </h2>
         {message && (
-          <p className={`mb-4 ${message.includes("success") ? "text-green-500" : "text-red-500"}`}>
+          <p
+            className={`mb-4 ${
+              message.includes("success") ? "text-green-500" : "text-red-500"
+            }`}
+          >
             {message}
           </p>
         )}
@@ -91,7 +86,9 @@ const Home = () => {
               onClick={toggleForm}
               className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 ml-2"
             >
-              {isSignUp ? "Already have an account? Login" : "Need an account? Sign Up"}
+              {isSignUp
+                ? "Already have an account? Login"
+                : "Need an account? Sign Up"}
             </button>
           </div>
         </form>
