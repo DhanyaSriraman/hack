@@ -12,7 +12,7 @@ function Sidebar({ setIsConvoStarted }) {
   const fetchConversation = async () => {
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/v1/conv/${user_id}/history`
+        `https://p9v82c8s-8000.inc1.devtunnels.ms/v1/conv/${user_id}/history`
       );
       setConversation(response.data.conversations);
     } catch (error) {
@@ -27,17 +27,18 @@ function Sidebar({ setIsConvoStarted }) {
   }, []);
 
   return (
-    <div className="bg-[#494949] w-[23vw] h-[100vh] text-white ">
+    <div className="bg-[#494949] w-[20vw] h-[100vh] text-white ">
       <div className="flex flex-col justify-between h-[80vh]">
         <img
           src={MatsyaLogo}
           alt="Logo"
           className="w-[17vw] h-[30vh] py-3 mx-auto"
         />
-        <div className="flex flex-col justify-center items-center">
+        <div className="overflow-y-scroll h-[150vh] py-2 px-2 scrollbar scrollbar-gray-900 scrollbar-h-[3vh]">
+        <div className="flex flex-col justify-center items-center ">
           <Link
             to={`/app/user/${user_id}/threads`}
-            className="bg-[#333333] p-1.5 rounded-2xl w-60 my-2 text-base text-center relative"
+            className="bg-[#333333] p-1.5 rounded-2xl w-60 my-2 text-base text-center"
             style={{ color: "#72A0C1" }}
             onClick={() => fetchConversation()}
           >
@@ -63,6 +64,7 @@ function Sidebar({ setIsConvoStarted }) {
                 </Link>
               );
             })}
+            </div>
         </div>
       </div>
     </div>

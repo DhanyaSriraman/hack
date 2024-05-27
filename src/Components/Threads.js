@@ -5,19 +5,20 @@ import Response from "./Response.js";
 import Input from "./Input";
 import Send from "../Assets/send.svg";
 import { useParams } from "react-router-dom";
+
 let currentUserId = 0;
 
 function Threads({ isConvoStarted, setIsConvoStarted }) {
-  const { id } = useParams();
+  let { id } = useParams();
   const { user_id } = useParams();
-
   if (user_id !== undefined) {
     currentUserId = user_id;
   }
 
   const [input, setinput] = useState("");
   const [messages, setMessages] = useState([]);
-  
+  const [convId, setConvId] = useState(id);
+
   const newChat = {
     user_id: currentUserId,
     created_at: Math.floor(Date.now() / 1000),
@@ -30,7 +31,7 @@ function Threads({ isConvoStarted, setIsConvoStarted }) {
           try {
             const convId = parseInt(id);
             const response = await axios.get(
-              `http://127.0.0.1:8000/v1/conv/${convId}/chat/history`
+              `https://p9v82c8s-8000.inc1.devtunnels.ms/v1/conv/${convId}/chat/history`
             );
             const parsedMessages = response.data.conversation.map(
               ({ chat_id, user_msg, ai_msg }) => ({
@@ -51,7 +52,13 @@ function Threads({ isConvoStarted, setIsConvoStarted }) {
         setMessages([]);
         const getConvId = async () => {
           try {
-            await axios.post("http://127.0.0.1:8000/v1/conv", newChat);
+            const convIdObj=await axios.post("https://p9v82c8s-8000.inc1.devtunnels.ms/v1/conv", newChat);
+            const newConvId=convIdObj.data.conv_id
+            if(newConvId!==undefined){
+              console.log("Hey in get conv id")
+              setConvId(newConvId);
+              console.log(id)
+            }
           } catch (error) {
             console.error("Error fetching conversation:", error);
           } finally {
@@ -64,15 +71,16 @@ function Threads({ isConvoStarted, setIsConvoStarted }) {
   }, [id, isConvoStarted]);
 
   const handleSubmit = async (e) => {
-    const convId = parseInt(id);
+    // const convId = parseInt(id);
+    console.log(typeof(convId))
     e.preventDefault();
     const chatPayload = {
-      conv_id: convId,
+      conv_id: parseInt(convId),
       user_msg: input,
       doc_name: "java",
     };
     const response = await axios.post(
-      "http://127.0.0.1:8000/v1/conv/chat",
+      "https://p9v82c8s-8000.inc1.devtunnels.ms/v1/conv/chat",
       chatPayload
     );
     setMessages([...messages, { input: input, res: response.data.response }]);
@@ -80,9 +88,9 @@ function Threads({ isConvoStarted, setIsConvoStarted }) {
   };
 
   return (
-    <div className="bg-[#A9BA9D] w-[100vw] h-[100vh]">
-      <div className="flex flex-col justify-between h-[98vh]">
-        <div className="bg-[#222222] flex mx-2 p-1 mt-4 px-2 rounded-2xl text-white justify-between">
+    <div className="bg-[#A9BA9D] w-[80vw] h-[100vh] overflow-hidden">
+      <div className="flex flex-col justify-between h-full">
+        <div className="bg-[#222222] flex mx-2 p-1 mt-4 px-2 rounded-2xl text-white justify-between max-w-full">
           <div className="flex p-2">
             <img src={User} className="w-10 mx-2" alt="User" />
             <div>
