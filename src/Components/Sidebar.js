@@ -34,7 +34,8 @@ function Sidebar({ setIsConvoStarted }) {
           alt="Logo"
           className="w-[17vw] h-[30vh] py-3 mx-auto"
         />
-        <div className="overflow-y-scroll h-[150vh] py-2 px-2 scrollbar scrollbar-gray-900 scrollbar-h-[3vh]">
+        {/* <div className="overflow-y-scroll h-[150vh] py-2 px-2 scrollbar scrollbar-gray-900 scrollbar-h-[3vh]"></div> */}
+        <div className="overflow-y-auto h-[150vh] py-2 px-2 scrollbar-thin scrollbar-thumb-[#00a67e] scrollbar-track-[#333333]">
         <div className="flex flex-col justify-center items-center ">
           <Link
             to={`/app/user/${user_id}/threads`}
